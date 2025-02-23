@@ -1,7 +1,7 @@
 {
   "name": "licss",
-  "version": "0.0.1",
-  "description": "gulp plugin. bundle, compile and minify style with lightningcss",
+  "version": "0.0.2",
+  "description": "gulp plugin. bundle, compile and minify sass and css style with lightningcss",
   "license": "MIT",
   "author": "llcawc",
   "homepage": "https://github.com/llcawc/licss",
@@ -12,7 +12,8 @@
     "tsc": "tsc -p ./plugin",
     "dev": "gulp dev",
     "serve": "passerve",
-    "build": "gulp build"
+    "sass": "gulp bsass",
+    "css": "gulp bucss"
   },
   "devDependencies": {
     "@rollup/plugin-terser": "^0.4.4",
@@ -24,13 +25,14 @@
     "gulp": "^5.0.0",
     "passerve": "^1.1.6",
     "rollup": "^4.34.7",
+    "source-map": "^0.7.4",
     "tslib": "^2.8.1",
     "typescript": "^5.7.3"
   },
   "dependencies": {
     "browserslist": "^4.24.4",
     "lightningcss": "^1.29.1",
-    "source-map": "^0.7.4",
+    "sass": "^1.85.0",
     "through2": "^4.0.2",
     "vinyl": "^3.0.0"
   }

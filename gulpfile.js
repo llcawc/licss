@@ -13,17 +13,15 @@ function serve(cb) {
   cb()
 }
 
-function css() {
-  return src(['src/styles/*.css'], { sourcemaps: true })
+// styles task
+function sass() {
+  return src(['src/sass/*.{sass,scss}'], { sourcemaps: true })
     .pipe(licss({ minify: false }))
     .pipe(dest('dist/css', { sourcemaps: '.' }))
 }
 
-// styles task
-function styles() {
-  return src('src/styles/*.css')
-    .pipe(licss({ minify: true }))
-    .pipe(dest('dist/css'))
+function css() {
+  return src(['src/styles/*.css']).pipe(licss()).pipe(dest('dist/css'))
 }
 
 // scripts task
@@ -68,12 +66,13 @@ function fonts() {
 //watch task
 function watcher() {
   watch('src/**/*.html', copy)
-  watch('src/styles/**/*.css', css)
+  watch('src/{styles,sass,scss}/**/*.{css,sass,scss}', sass)
   watch('src/scripts/**/*.ts', scripts)
 }
 
 // export
-export { clean, copy, images, fonts, css, styles, scripts, serve }
+export { clean, copy, images, fonts, css, sass, scripts, serve }
 export const assets = series(images, fonts)
-export const dev = series(clean, copy, css, scripts, assets, parallel(watcher, serve))
-export const build = series(clean, copy, styles, scripts, assets)
+export const dev = series(clean, copy, sass, scripts, assets, parallel(watcher, serve))
+export const bsass = series(clean, copy, sass, scripts, assets)
+export const bucss = series(clean, copy, css, scripts, assets)

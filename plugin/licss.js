@@ -1,10 +1,19 @@
 import { Buffer } from 'node:buffer';
-import { relative } from 'node:path';
-import through2 from 'through2';
 import browserslist from 'browserslist';
-import { bundle, browserslistToTargets } from 'lightningcss';
-export default function licss(options = {}) {
-    return through2.obj(function (file, _, cb) {
+import through2 from 'through2';
+import { bundle, transform, browserslistToTargets } from 'lightningcss';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { dirname, join, relative } from 'node:path';
+import { compileStringAsync } from 'sass';
+export default function licss(options = {
+    minify: true,
+    loadPaths: undefined,
+}) {
+    return through2.obj(async function (file, _, cb) {
+        if (file.stem.startsWith('_')) {
+            cb();
+            return;
+        }
         if (file.isBuffer()) {
             try {
                 const targets = browserslist.loadConfig({ path: file.cwd })
@@ -13,26 +22,69 @@ export default function licss(options = {}) {
                 const filename = file.path;
                 const minify = options.minify ? true : false;
                 const sourceMap = file.sourceMap ? true : false;
-                // compile style
-                const { code, map } = bundle({
+                const compileTransformOptions = {
+                    targets,
+                    filename,
+                    minify,
+                    inputSourceMap: '',
+                    sourceMap,
+                    code: Buffer.from(''),
+                };
+                const compileBundleOptions = {
                     targets,
                     filename,
                     minify,
                     sourceMap,
-                });
-                file.contents = Buffer.from(code.toString());
-                if (sourceMap) {
-                    // add file
-                    const mapContent = JSON.parse(String(map).toString());
-                    mapContent.file = relative(file.base, filename);
-                    // fix paths
-                    mapContent.file = mapContent.file.replace(/\\/g, '/');
-                    mapContent.sources = mapContent.sources.map(function (path) {
-                        path = relative(file.base, path);
-                        path = path.replace(/\\/g, '/');
-                        return path;
-                    });
-                    file.sourceMap = mapContent;
+                };
+                // compile sass or scss files
+                if (file.extname === '.sass' || file.extname === '.scss') {
+                    // sass compile options
+                    const syntax = file.extname === '.sass' ? 'indented' : 'scss';
+                    const style = 'expanded';
+                    const loadPaths = options.loadPaths
+                        ? [...options.loadPaths]
+                        : [dirname(file.path), join(file.cwd, 'node_modules')];
+                    const sassOptions = {
+                        url: pathToFileURL(file.path),
+                        loadPaths: loadPaths,
+                        syntax: syntax,
+                        style: style,
+                        sourceMap: sourceMap,
+                        sourceMapIncludeSources: true,
+                    };
+                    // sass compile
+                    const fileContents = String(file.contents).toString();
+                    const result = await compileStringAsync(fileContents, sassOptions);
+                    file.extname = '.css';
+                    // use sass map
+                    const sassMap = result.sourceMap;
+                    // compile lightningcss
+                    compileTransformOptions.filename = file.path;
+                    compileTransformOptions.code = Buffer.from(result.css);
+                    if (sourceMap && sassMap) {
+                        // compile lightningcss with map
+                        parseSourceMap(file, sassMap);
+                        compileTransformOptions.inputSourceMap = JSON.stringify(sassMap);
+                        const { code, map } = transform(compileTransformOptions);
+                        file.contents = Buffer.from(code.toString());
+                        file.sourceMap = JSON.parse(String(map).toString());
+                    }
+                    else {
+                        // compile lightningcss and no map
+                        const { code } = transform(compileTransformOptions);
+                        file.contents = Buffer.from(code.toString());
+                    }
+                }
+                else {
+                    // compile css file with use lightningcss
+                    const { code, map } = bundle(compileBundleOptions);
+                    file.contents = Buffer.from(code.toString());
+                    // if need map
+                    if (sourceMap) {
+                        const mapContent = JSON.parse(String(map).toString());
+                        parseSourceMap(file, mapContent);
+                        file.sourceMap = mapContent;
+                    }
                 }
             }
             catch (err) {
@@ -40,5 +92,27 @@ export default function licss(options = {}) {
             }
         }
         cb(null, file);
+    });
+}
+function parseSourceMap(file, sourceMap) {
+    if (file.sourceMap && typeof file.sourceMap === 'string') {
+        file.sourceMap = JSON.parse(file.sourceMap);
+    }
+    // insert file in to map
+    if (!sourceMap.file)
+        sourceMap.file = file.relative;
+    sourceMap.file = sourceMap.file.replace(/\\/g, '/');
+    // made path to relative
+    sourceMap.sources.map((path, index) => {
+        if (/file:/i.test(path)) {
+            path = fileURLToPath(path);
+        }
+        let base = file.base;
+        if (/^\/?/.test(base)) {
+            base = file.base.replace(/^\/?/, '');
+        }
+        path = relative(base, path);
+        path = path.replace(/\\/g, '/');
+        sourceMap.sources[index] = path;
     });
 }

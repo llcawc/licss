@@ -1,6 +1,7 @@
 /* main.css */
-@import "blocks/colormode.css";
+@import "blocks/style.css";
 @import "blocks/fonts.css";
+@import "blocks/colormode.css";
 
 /* custom code */
 
