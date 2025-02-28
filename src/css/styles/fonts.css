@@ -1,3 +1,5 @@
+/* fonts.css • FONTS LOAD section */
+
 @font-face {
   font-family: "psinter";
   font-weight: 100;
@@ -5,7 +7,6 @@
   font-display: swap;
   src: url("/fonts/Inter-Thin.woff2") format("woff2");
 }
-
 @font-face {
   font-family: "psinter";
   font-weight: 100;
@@ -13,7 +14,6 @@
   font-display: swap;
   src: url("/fonts/Inter-ThinItalic.woff2") format("woff2");
 }
-
 @font-face {
   font-family: "psinter";
   font-weight: 200;
@@ -21,7 +21,6 @@
   font-display: swap;
   src: url("/fonts/Inter-ExtraLight.woff2") format("woff2");
 }
-
 @font-face {
   font-family: "psinter";
   font-weight: 200;
@@ -29,7 +28,6 @@
   font-display: swap;
   src: url("/fonts/Inter-ExtraLightItalic.woff2") format("woff2");
 }
-
 @font-face {
   font-family: "psinter";
   font-weight: 300;
@@ -37,7 +35,6 @@
   font-display: swap;
   src: url("/fonts/Inter-Light.woff2") format("woff2");
 }
-
 @font-face {
   font-family: "psinter";
   font-weight: 300;
@@ -45,7 +42,6 @@
   font-display: swap;
   src: url("/fonts/Inter-LightItalic.woff2") format("woff2");
 }
-
 @font-face {
   font-family: "psinter";
   font-weight: 400;
@@ -53,7 +49,6 @@
   font-display: swap;
   src: url("/fonts/Inter-Regular.woff2") format("woff2");
 }
-
 @font-face {
   font-family: "psinter";
   font-weight: 400;
@@ -61,7 +56,6 @@
   font-display: swap;
   src: url("/fonts/Inter-Italic.woff2") format("woff2");
 }
-
 @font-face {
   font-family: "psinter";
   font-weight: 500;
@@ -69,7 +63,6 @@
   font-display: swap;
   src: url("/fonts/Inter-Medium.woff2") format("woff2");
 }
-
 @font-face {
   font-family: "psinter";
   font-weight: 500;
@@ -77,7 +70,6 @@
   font-display: swap;
   src: url("/fonts/Inter-MediumItalic.woff2") format("woff2");
 }
-
 @font-face {
   font-family: "psinter";
   font-weight: 600;
@@ -85,7 +77,6 @@
   font-display: swap;
   src: url("/fonts/Inter-SemiBold.woff2") format("woff2");
 }
-
 @font-face {
   font-family: "psinter";
   font-weight: 600;
@@ -93,7 +84,6 @@
   font-display: swap;
   src: url("/fonts/Inter-SemiBoldItalic.woff2") format("woff2");
 }
-
 @font-face {
   font-family: "psinter";
   font-weight: 700;
@@ -101,7 +91,6 @@
   font-display: swap;
   src: url("/fonts/Inter-Bold.woff2") format("woff2");
 }
-
 @font-face {
   font-family: "psinter";
   font-weight: 700;
@@ -109,7 +98,6 @@
   font-display: swap;
   src: url("/fonts/Inter-BoldItalic.woff2") format("woff2");
 }
-
 @font-face {
   font-family: "psinter";
   font-weight: 800;
@@ -117,7 +105,6 @@
   font-display: swap;
   src: url("/fonts/Inter-ExtraBold.woff2") format("woff2");
 }
-
 @font-face {
   font-family: "psinter";
   font-weight: 800;
@@ -125,7 +112,6 @@
   font-display: swap;
   src: url("/fonts/Inter-ExtraBoldItalic.woff2") format("woff2");
 }
-
 @font-face {
   font-family: "psinter";
   font-weight: 900;
@@ -133,11 +119,122 @@
   font-display: swap;
   src: url("/fonts/Inter-Black.woff2") format("woff2");
 }
-
 @font-face {
   font-family: "psinter";
   font-weight: 900;
   font-style: italic;
   font-display: swap;
   src: url("/fonts/Inter-BlackItalic.woff2") format("woff2");
+}
+@font-face {
+  font-family: "psjbmono";
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+  src: url("/fonts/JetBrainsMono-Thin.woff2") format("woff2");
+}
+@font-face {
+  font-family: "psjbmono";
+  font-weight: 100;
+  font-style: italic;
+  font-display: swap;
+  src: url("/fonts/JetBrainsMono-ThinItalic.woff2") format("woff2");
+}
+@font-face {
+  font-family: "psjbmono";
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+  src: url("/fonts/JetBrainsMono-ExtraLight.woff2") format("woff2");
+}
+@font-face {
+  font-family: "psjbmono";
+  font-weight: 200;
+  font-style: italic;
+  font-display: swap;
+  src: url("/fonts/JetBrainsMono-ExtraLightItalic.woff2") format("woff2");
+}
+@font-face {
+  font-family: "psjbmono";
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+  src: url("/fonts/JetBrainsMono-Light.woff2") format("woff2");
+}
+@font-face {
+  font-family: "psjbmono";
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+  src: url("/fonts/JetBrainsMono-LightItalic.woff2") format("woff2");
+}
+@font-face {
+  font-family: "psjbmono";
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url("/fonts/JetBrainsMono-Regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: "psjbmono";
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+  src: url("/fonts/JetBrainsMono-Italic.woff2") format("woff2");
+}
+@font-face {
+  font-family: "psjbmono";
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+  src: url("/fonts/JetBrainsMono-Medium.woff2") format("woff2");
+}
+@font-face {
+  font-family: "psjbmono";
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+  src: url("/fonts/JetBrainsMono-MediumItalic.woff2") format("woff2");
+}
+@font-face {
+  font-family: "psjbmono";
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+  src: url("/fonts/JetBrainsMono-SemiBold.woff2") format("woff2");
+}
+@font-face {
+  font-family: "psjbmono";
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+  src: url("/fonts/JetBrainsMono-SemiBoldItalic.woff2") format("woff2");
+}
+@font-face {
+  font-family: "psjbmono";
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  src: url("/fonts/JetBrainsMono-Bold.woff2") format("woff2");
+}
+@font-face {
+  font-family: "psjbmono";
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+  src: url("/fonts/JetBrainsMono-BoldItalic.woff2") format("woff2");
+}
+@font-face {
+  font-family: "psjbmono";
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+  src: url("/fonts/JetBrainsMono-ExtraBold.woff2") format("woff2");
+}
+@font-face {
+  font-family: "psjbmono";
+  font-weight: 800;
+  font-style: italic;
+  font-display: swap;
+  src: url("/fonts/JetBrainsMono-ExtraBoldItalic.woff2") format("woff2");
 }

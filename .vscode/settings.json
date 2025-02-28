@@ -10,7 +10,16 @@
     "package.json": "package-lock.json, pnpm*, .yarnrc*, yarn*, .eslint*, eslint*, .prettier*, prettier*, .editorconfig, .stylelin*"
   },
 
-  "stylelint.validate": ["css", "scss"],
+  "files.associations": {
+    "*.pcss": "scss"
+  },
+  "emmet.includeLanguages": {
+    "postcss": "scss"
+  },
+  "vsicons.associations.files": [{ "icon": "postcss", "extensions": ["pcss"], "format": "svg" }],
+  "vsicons.associations.folders": [{ "icon": "style", "extensions": ["pcss"], "format": "svg", "overrides": "pcss" }],
+
+  "stylelint.validate": ["css", "scss", "pcss"],
   "eslint.validate": ["typescript", "javascript"],
   "eslint.enable": true,
   "editor.codeActionsOnSave": {

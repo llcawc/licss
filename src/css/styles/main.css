@@ -1,0 +1,26 @@
+/* main.css */
+
+@import "./blocks/style.css";
+@import url('./colormode.css');
+@import "fonts.css";
+@import "../libs/bootstrap-icons.css";
+
+/* custom code */
+
+.btn {
+  display: inline-flex;
+  gap: 0 4px;
+  align-items: center;
+
+  padding: 8px 24px;
+  border: 1px solid var(--links);
+  border-radius: 6px;
+
+  transition: 200ms ease;
+
+  &:hover {
+    color: white;
+    text-decoration: none;
+    background-color: var(--links);
+  }
+}

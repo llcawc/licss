@@ -1,0 +1,52 @@
+/*!
+ * Bootstrap Icons v1.11.3 (https://icons.getbootstrap.com/)
+ * Copyright 2019-2024 The Bootstrap Authors
+ * Licensed under MIT (https://github.com/twbs/icons/blob/main/LICENSE)
+ */
+
+@font-face {
+  font-family: "bootstrap-icons";
+  font-display: block;
+  src: url("/fonts/bootstrap-icons.woff2?24e3eb84d0bcaf83d77f904c78ac1f47") format("woff2"), url("/fonts/bootstrap-icons.woff?24e3eb84d0bcaf83d77f904c78ac1f47") format("woff");
+}
+
+.bi::before,
+[class^="bi-"]::before,
+[class*=" bi-"]::before {
+  display: inline-block;
+
+  font-family: "bootstrap-icons", fantasy !important;
+  font-weight: 400 !important;
+  font-style: normal;
+  font-variant: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1;
+  text-transform: none;
+  vertical-align: -.125em;
+}
+
+// only the necessary
+$bootstrap-icons-map: (
+  "bell": "\f18a",
+  "chevron-left": "\F284",
+  "chevron-right": "\F285",
+  "eye": "\f341",
+  "house": "\f425",
+  "pencil-square": "\f4ca",
+  "vector-pen": "\F604",
+  "signpost": "\f54a",
+  "exclamation-diamond": "\f335",
+  "arrow-left-short": "\f12c",
+  "arrow-right-short": "\f135",
+  "check2": "\f272",
+  "circle-half": "\f288",
+  "cloud-sun-fill": "\f2bd",
+  "moon-stars-fill": "\f495",
+);
+
+@each $icon, $codepoint in $bootstrap-icons-map {
+  .bi-#{$icon}::before {
+    content: $codepoint;
+  }
+}

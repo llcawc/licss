@@ -1,38 +1,72 @@
 // import modules
-import { rollup } from 'rollup'
+import { babel } from '@rollup/plugin-babel'
+import commonjs from '@rollup/plugin-commonjs'
+import resolve from '@rollup/plugin-node-resolve'
 import terser from '@rollup/plugin-terser'
 import typescript from '@rollup/plugin-typescript'
+import { rollup } from 'rollup'
 import { deleteAsync as del } from 'del'
-import gulp from 'gulp'
-import licss from './plugin/licss.js'
-import server from 'passerve'
-const { src, dest, parallel, series, watch } = gulp
+import rename from 'gulp-ren'
 
-function serve(cb) {
-  server({ port: 3000, dist: 'dist' })
-  cb()
-}
+import licss from './plugin/licss.js'
+import gulp from 'gulp'
+const { src, dest, series } = gulp
 
 // styles task
-function sass() {
-  return src(['src/sass/*.{sass,scss}'], { sourcemaps: true })
-    .pipe(licss({ minify: false }))
+async function scss() {
+  copy(['src/scss/*.html'])
+  await comp('src/scss/scripts/main.ts', ['src/scss/scripts/*'])
+  del(['dist/css/*'])
+  return src(['src/scss/styles/*.scss'], { sourcemaps: false })
+    .pipe(licss({ minify: true }))
     .pipe(dest('dist/css', { sourcemaps: '.' }))
 }
 
-function css() {
-  return src(['src/styles/*.css']).pipe(licss()).pipe(dest('dist/css'))
+async function sass() {
+  copy(['src/sass/*.html'])
+  await comp('src/sass/scripts/main.ts', ['src/sass/scripts/*'])
+  del(['dist/css/*'])
+  return src(['src/sass/styles/*.sass'], { sourcemaps: true })
+    .pipe(licss({ minify: false }))
+    .pipe(rename({ suffix: '.min' }))
+    .pipe(dest('dist/css', { sourcemaps: '.' }))
+}
+
+async function css() {
+  copy(['src/css/*.html'])
+  await comp('src/css/scripts/main.ts', ['src/css/scripts/*'])
+  del(['dist/css/*'])
+  return src(['src/css/styles/main.css'], { sourcemaps: false })
+    .pipe(licss({ minify: true }))
+    .pipe(dest('dist/css', { sourcemaps: '.' }))
+}
+
+async function pcss() {
+  copy(['src/pcss/*.html'])
+  await comp('src/pcss/scripts/main.ts', ['src/pcss/scripts/*'])
+  del(['dist/css/*'])
+  return src(['src/pcss/styles/main.pcss'], { sourcemaps: true })
+    .pipe(licss({ minify: true }))
+    .pipe(rename({ suffix: '.min', extname: '.css' }))
+    .pipe(dest('dist/css', { sourcemaps: '.' }))
 }
 
 // scripts task
 async function scripts() {
+  await comp('src/css/scripts/main.ts', ['src/css/scripts/*'])
+}
+
+async function comp(src, path) {
   const bundle = await rollup({
-    input: 'src/scripts/main.ts',
+    input: src,
     plugins: [
       typescript({
         compilerOptions: { lib: ['ESNext', 'DOM', 'DOM.Iterable'], target: 'ESNext' },
-        include: ['src/scripts/*'],
+        include: path,
       }),
+      resolve(),
+      commonjs({ include: 'node_modules/**' }),
+      babel({ babelHelpers: 'bundled' }),
     ],
   })
   await bundle.write({
@@ -49,8 +83,8 @@ function clean() {
 }
 
 // copy task
-function copy() {
-  return src(['src/**/*.html'], { base: 'src' }).pipe(dest('dist'))
+function copy(source) {
+  return src(source).pipe(dest('dist'))
 }
 
 // assets task
@@ -63,16 +97,6 @@ function fonts() {
   }).pipe(dest('dist/fonts'))
 }
 
-//watch task
-function watcher() {
-  watch('src/**/*.html', copy)
-  watch('src/{styles,sass,scss}/**/*.{css,sass,scss}', sass)
-  watch('src/scripts/**/*.ts', scripts)
-}
-
 // export
-export { clean, copy, images, fonts, css, sass, scripts, serve }
-export const assets = series(images, fonts)
-export const dev = series(clean, copy, sass, scripts, assets, parallel(watcher, serve))
-export const bsass = series(clean, copy, sass, scripts, assets)
-export const bucss = series(clean, copy, css, scripts, assets)
+export { clean, copy, images, fonts, sass, scss, css, pcss, scripts }
+export const dev = series(clean, images, fonts)

@@ -1,90 +1,57 @@
 import { Buffer } from 'node:buffer';
 import browserslist from 'browserslist';
 import through2 from 'through2';
-import { bundle, transform, browserslistToTargets } from 'lightningcss';
+import { transform, bundle, browserslistToTargets } from 'lightningcss';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { dirname, join, relative } from 'node:path';
-import { compileStringAsync } from 'sass';
+import { compileString } from 'sass';
 export default function licss(options = {
-    minify: true,
+    minify: undefined,
     loadPaths: undefined,
 }) {
-    return through2.obj(async function (file, _, cb) {
+    return through2.obj(function (file, _, cb) {
+        // exclude chunk files
         if (file.stem.startsWith('_')) {
             cb();
             return;
         }
         if (file.isBuffer()) {
             try {
-                const targets = browserslist.loadConfig({ path: file.cwd })
-                    ? browserslistToTargets(browserslist(browserslist.loadConfig({ path: file.cwd }) ?? browserslist.defaults))
-                    : browserslistToTargets(browserslist('> 0.2%, last 2 major versions, not dead'));
-                const filename = file.path;
-                const minify = options.minify ? true : false;
-                const sourceMap = file.sourceMap ? true : false;
-                const compileTransformOptions = {
-                    targets,
-                    filename,
-                    minify,
-                    inputSourceMap: '',
-                    sourceMap,
-                    code: Buffer.from(''),
-                };
-                const compileBundleOptions = {
-                    targets,
-                    filename,
-                    minify,
-                    sourceMap,
-                };
-                // compile sass or scss files
-                if (file.extname === '.sass' || file.extname === '.scss') {
-                    // sass compile options
+                const minify = !!options.minify; // normalize boolean
+                const sourceMap = !!file.sourceMap; // normalize boolean
+                // compile css, scss or sass files
+                if (file.extname === '.css' || file.extname === '.sass' || file.extname === '.scss') {
                     const syntax = file.extname === '.sass' ? 'indented' : 'scss';
-                    const style = 'expanded';
-                    const loadPaths = options.loadPaths
-                        ? [...options.loadPaths]
-                        : [dirname(file.path), join(file.cwd, 'node_modules')];
+                    const style = minify ? 'compressed' : 'expanded';
+                    const loadPaths = options.loadPaths ?? [dirname(file.path), join(file.cwd, 'node_modules')];
                     const sassOptions = {
                         url: pathToFileURL(file.path),
-                        loadPaths: loadPaths,
-                        syntax: syntax,
-                        style: style,
-                        sourceMap: sourceMap,
+                        loadPaths,
+                        syntax,
+                        style,
+                        sourceMap,
                         sourceMapIncludeSources: true,
                     };
+                    let fileContents = String(file.contents).toString();
+                    // fix imports
+                    fileContents = fileContents.replace(/@import +([url(]*)["']([./]*)([a-z-_/]+)\.?(.*)['"]\)?/gi, '@import "$2$3"');
                     // sass compile
-                    const fileContents = String(file.contents).toString();
-                    const result = await compileStringAsync(fileContents, sassOptions);
+                    const result = compileString(fileContents, sassOptions);
+                    file.contents = Buffer.from(result.css);
                     file.extname = '.css';
-                    // use sass map
                     const sassMap = result.sourceMap;
-                    // compile lightningcss
-                    compileTransformOptions.filename = file.path;
-                    compileTransformOptions.code = Buffer.from(result.css);
-                    if (sourceMap && sassMap) {
-                        // compile lightningcss with map
-                        parseSourceMap(file, sassMap);
-                        compileTransformOptions.inputSourceMap = JSON.stringify(sassMap);
-                        const { code, map } = transform(compileTransformOptions);
-                        file.contents = Buffer.from(code.toString());
-                        file.sourceMap = JSON.parse(String(map).toString());
+                    // add map in to file
+                    if (sourceMap && !!sassMap) {
+                        addSourceMap(file, sassMap, true);
                     }
-                    else {
-                        // compile lightningcss and no map
-                        const { code } = transform(compileTransformOptions);
-                        file.contents = Buffer.from(code.toString());
+                    // transform code with lightningcss
+                    if (!sourceMap) {
+                        licssTransform(file, minify, sourceMap);
                     }
                 }
                 else {
-                    // compile css file with use lightningcss
-                    const { code, map } = bundle(compileBundleOptions);
-                    file.contents = Buffer.from(code.toString());
-                    // if need map
-                    if (sourceMap) {
-                        const mapContent = JSON.parse(String(map).toString());
-                        parseSourceMap(file, mapContent);
-                        file.sourceMap = mapContent;
-                    }
+                    // compile postcss file
+                    licssBundle(file, minify, sourceMap);
                 }
             }
             catch (err) {
@@ -94,25 +61,105 @@ export default function licss(options = {
         cb(null, file);
     });
 }
-function parseSourceMap(file, sourceMap) {
-    if (file.sourceMap && typeof file.sourceMap === 'string') {
-        file.sourceMap = JSON.parse(file.sourceMap);
+// transform string css code with lightningcss
+function licssTransform(file, minify, sourceMap) {
+    if (file.isBuffer()) {
+        // compile css files
+        const targets = browserslist.loadConfig({ path: file.cwd })
+            ? browserslistToTargets(browserslist(browserslist.loadConfig({ path: file.cwd }) ?? browserslist.defaults))
+            : browserslistToTargets(browserslist('> 0.2%, last 2 major versions, not dead'));
+        const filename = file.path;
+        const inputSourceMap = sourceMap ? JSON.stringify(file.sourceMap) : undefined;
+        const compileOptions = {
+            targets,
+            filename,
+            minify,
+            inputSourceMap,
+            sourceMap,
+            code: Buffer.from(file.contents.toString()),
+            projectRoot: file.base,
+        };
+        // compile css file with use lightningcss
+        const { code, map } = transform(compileOptions);
+        file.contents = Buffer.from(code.toString());
+        // if need map
+        if (sourceMap && !!map) {
+            const mapContent = JSON.parse(map.toString());
+            mapContent.file = file.relative;
+            mapContent.sourceRoot = '';
+            file.sourceMap = mapContent;
+        }
     }
-    // insert file in to map
-    if (!sourceMap.file)
-        sourceMap.file = file.relative;
-    sourceMap.file = sourceMap.file.replace(/\\/g, '/');
-    // made path to relative
-    sourceMap.sources.map((path, index) => {
-        if (/file:/i.test(path)) {
-            path = fileURLToPath(path);
+}
+// bundle and transforn css or postcss files with lightningcss
+function licssBundle(file, minify, sourceMap) {
+    if (file.isBuffer()) {
+        const targets = browserslist.loadConfig({ path: file.cwd })
+            ? browserslistToTargets(browserslist(browserslist.loadConfig({ path: file.cwd }) ?? browserslist.defaults))
+            : browserslistToTargets(browserslist('> 0.2%, last 2 major versions, not dead'));
+        const filename = file.path;
+        const compileOptions = {
+            targets,
+            filename,
+            minify,
+            sourceMap,
+            projectRoot: file.base,
+        };
+        // compile css file with use lightningcss
+        const { code, map } = bundle(compileOptions);
+        file.contents = Buffer.from(code.toString());
+        // add map in file
+        if (sourceMap && !!map) {
+            const mapContent = JSON.parse(map.toString());
+            mapContent.file = file.relative;
+            mapContent.sourceRoot = '';
+            file.sourceMap = mapContent;
         }
-        let base = file.base;
-        if (/^\/?/.test(base)) {
-            base = file.base.replace(/^\/?/, '');
+    }
+}
+// fix sources and insert map in to file after sass compiler
+function addSourceMap(file, map, relativePath) {
+    // insert "file": in to map
+    if (file.isBuffer()) {
+        if (!map.file) {
+            if (relativePath) {
+                map.file = file.relative;
+            }
+            else {
+                map.file = file.path;
+            }
         }
-        path = relative(base, path);
-        path = path.replace(/\\/g, '/');
-        sourceMap.sources[index] = path;
-    });
+        // fix "file:" paths
+        if (/file:/i.test(map.file)) {
+            map.file = fileURLToPath(map.file);
+        }
+        // fix paths if Windows style paths
+        if (/\\/.test(map.file)) {
+            map.file = map.file.replace(/\\/g, '/');
+        }
+        // and fix "sources:" paths too
+        map.sources.map((path, index) => {
+            if (/file:/i.test(path)) {
+                path = fileURLToPath(path);
+            }
+            // make relative path if need
+            if (relativePath) {
+                let base = file.base;
+                if (/^\/?/.test(base)) {
+                    base = file.base.replace(/^\/?/, '');
+                }
+                path = relative(base, path);
+            }
+            if (/\\/.test(path)) {
+                path = path.replace(/\\/g, '/');
+            }
+            map.sources[index] = path;
+        });
+        if (!file.sourceMap) {
+            throw new Error('sourcemap not enable');
+        }
+        else {
+            file.sourceMap = map;
+        }
+    }
 }
