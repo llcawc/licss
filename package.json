@@ -9,11 +9,9 @@
   "main": "./plugin/licss.js",
   "exports": "./plugin/licss.js",
   "scripts": {
-    "lint": "stylelint src/**/*.scss",
     "tsc": "tsc -p ./plugin",
     "serve": "passerve",
-    "build": "gulp build",
-    "dev": "gulp dev",
+    "start": "gulp assets",
     "sass": "gulp sass",
     "scss": "gulp scss",
     "pcss": "gulp pcss",
