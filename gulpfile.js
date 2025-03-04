@@ -13,13 +13,28 @@ import licss from './plugin/licss.js'
 import gulp from 'gulp'
 const { src, dest, series } = gulp
 
+// variables & paths
+const purgecss = {
+  content: ['src/*.html', 'src/assets/scripts/**/*.ts'],
+}
+const purge = {
+  content: [
+    'src/html/**/*.html',
+    'src/assets/scripts/**/*.ts',
+    'node_modules/bootstrap/js/dist/dom/*.js',
+    'node_modules/bootstrap/js/dist/dropdown.js',
+  ],
+  safelist: [/show/],
+  keyframes: true,
+}
+
 // styles task
 async function css() {
   await deleteAsync(['dist/css/*', 'dist/js/*'])
   copy(['src/*.html'])
   await scripts('src/assets/scripts/main.ts')
   return src(['src/styles/css/main.css'], { sourcemaps: true })
-    .pipe(licss({ minify: true }))
+    .pipe(licss({ minify: true, purgeOptions: purgecss }))
     .pipe(dest('dist/css', { sourcemaps: '.' }))
 }
 async function pcss() {
@@ -35,8 +50,8 @@ async function scss() {
   await deleteAsync(['dist/css/*', 'dist/js/*'])
   copy(['src/html/*.html'])
   await scripts('src/assets/scripts/script.ts')
-  return src(['src/styles/scss/main.scss'], { sourcemaps: true })
-    .pipe(licss({ minify: false }))
+  return src(['src/styles/scss/main.scss'], { sourcemaps: false })
+    .pipe(licss({ minify: false, purgeOptions: purge }))
     .pipe(rename({ suffix: '.min', extname: '.css' }))
     .pipe(dest('dist/css', { sourcemaps: '.' }))
 }

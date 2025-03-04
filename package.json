@@ -1,7 +1,20 @@
 {
   "name": "licss",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "gulp plugin. bundles, compiles and minifies sass, scss, css and postcss stylesheets. use it for bootsrtap 5.3.3 (for the stop warning, sass v.1.77.4 was used here). made by pasmurno from llcawc",
+  "keywords": [
+    "gulp",
+    "optimize",
+    "bundle",
+    "minify",
+    "purge",
+    "styles",
+    "css",
+    "sass",
+    "scss",
+    "pcss",
+    "bootstrap"
+  ],
   "license": "MIT",
   "author": "llcawc",
   "homepage": "https://github.com/llcawc/licss",
@@ -54,6 +67,7 @@
   },
   "dependencies": {
     "browserslist": "^4.24.4",
+    "glob": "^11.0.1",
     "lightningcss": "^1.29.1",
     "purgecss": "^7.0.2",
     "sass": "1.77.4",

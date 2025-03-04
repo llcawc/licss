@@ -7,14 +7,21 @@ import { RawSourceMap } from 'source-map'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { dirname, join, relative } from 'node:path'
 import { compileString, OutputStyle, Syntax } from 'sass'
+import { PurgeCSS, UserDefinedOptions } from 'purgecss'
+import * as glob from 'glob'
 
 export default function licss(
-  options: { minify?: boolean | undefined; loadPaths?: string[] | undefined } = {
-    minify: undefined,
-    loadPaths: undefined,
-  }
+  options: {
+    minify?: boolean | undefined
+    loadPaths?: string[] | undefined
+    purgeOptions?: UserDefinedOptions | undefined
+  } = { minify: undefined, loadPaths: undefined, purgeOptions: undefined }
 ) {
-  return through2.obj(function (file: File, _, cb) {
+  return through2.obj(async function (file: File, _, cb) {
+    // empty
+    if (file.isNull()) {
+      return cb(null, file)
+    }
     // exclude chunk files
     if (file.stem.startsWith('_')) {
       cb()
@@ -63,6 +70,10 @@ export default function licss(
         } else {
           // compile postcss file
           licssBundle(file, minify, sourceMap)
+        }
+        // purgecss
+        if (options.purgeOptions && !sourceMap) {
+          await purge(file, options.purgeOptions)
         }
       } catch (err) {
         console.error(err)
@@ -181,6 +192,38 @@ function addSourceMap(file: File, map: RawSourceMap, relativePath: boolean) {
       throw new Error('sourcemap not enable')
     } else {
       file.sourceMap = map
+    }
+  }
+}
+
+function getFiles(contentArray: string[], ignore: string | string[] | undefined) {
+  return contentArray.reduce((acc: string[], content: string) => {
+    return [...acc, ...glob.sync(content, { ignore })]
+  }, [])
+}
+
+async function purge(file: File, options: UserDefinedOptions) {
+  // buffer
+  if (file.isBuffer()) {
+    const content = options.content as string[]
+    const optionsGulp = {
+      ...options,
+      content: getFiles(content, options.skippedContentGlobs),
+      css: [
+        {
+          raw: file.contents.toString(),
+        },
+      ],
+      stdin: true,
+      sourceMap: false,
+    }
+    const purgedCSSResults = await new PurgeCSS().purge(optionsGulp)
+    const purge = purgedCSSResults[0]
+    const result = optionsGulp.rejected && purge.rejected ? purge.rejected.join(' {}\n') + ' {}' : purge.css
+    file.contents = Buffer.from(result, 'utf-8')
+    // apply source map to the chain
+    if (file.sourceMap && purge.sourceMap) {
+      file.sourceMap = purge.sourceMap
     }
   }
 }
