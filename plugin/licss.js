@@ -1,6 +1,7 @@
 import { Buffer } from 'node:buffer';
 import browserslist from 'browserslist';
 import through2 from 'through2';
+import PluginError from 'plugin-error';
 import { transform, bundle, browserslistToTargets } from 'lightningcss';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { dirname, join, relative } from 'node:path';
@@ -68,7 +69,9 @@ export default function licss(options = { minify: undefined, loadPaths: undefine
                 }
             }
             catch (err) {
-                console.error(err);
+                const opts = Object.assign({}, options, { fileName: file.path });
+                const error = new PluginError('licss', err, opts);
+                cb(error);
             }
         }
         cb(null, file);

@@ -2,6 +2,7 @@ import File from 'vinyl'
 import { Buffer } from 'node:buffer'
 import browserslist from 'browserslist'
 import through2 from 'through2'
+import PluginError from 'plugin-error'
 import { transform, bundle, browserslistToTargets, Targets } from 'lightningcss'
 import { RawSourceMap } from 'source-map'
 import { fileURLToPath, pathToFileURL } from 'node:url'
@@ -84,7 +85,9 @@ export default function licss(
           await purge(file, options.purgeOptions)
         }
       } catch (err) {
-        console.error(err)
+        const opts = Object.assign({}, options, { fileName: file.path })
+        const error = new PluginError('licss', err as string | Error, opts)
+        cb(error)
       }
     }
     cb(null, file)

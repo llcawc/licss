@@ -30,16 +30,16 @@ async function css() {
   await deleteAsync(['dist/css/*', 'dist/js/*'])
   copy(['src/*.html'])
   await scripts('src/assets/scripts/main.ts')
-  return src(['src/styles/css/main.css'], { sourcemaps: false })
-    .pipe(licss({ minify: true, purgeOptions: purgecss }))
+  return src(['src/styles/css/main.css'], { sourcemaps: true })
+    .pipe(licss({ minify: false, purgeOptions: purgecss }))
     .pipe(dest('dist/css', { sourcemaps: '.' }))
 }
 async function pcss() {
   await deleteAsync(['dist/css/*', 'dist/js/*'])
   copy(['src/*.html'])
   await scripts('src/assets/scripts/main.ts')
-  return src(['src/styles/pcss/main.pcss'], { sourcemaps: true })
-    .pipe(licss({ minify: true }))
+  return src(['src/styles/pcss/main.pcss'], { sourcemaps: false })
+    .pipe(licss({ minify: true, purgeOptions: purgecss }))
     .pipe(rename({ extname: '.css' }))
     .pipe(dest('dist/css', { sourcemaps: '.' }))
 }

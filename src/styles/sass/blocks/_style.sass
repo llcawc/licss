@@ -1,8 +1,5 @@
 @charset "UTF-8"
-/**
- * Made based on water.css.
- * Use the ".dark" class in the "html" selector to enable the dark scheme.
- */
+/* Made based on water.css. Use the ".dark" class in the "html" selector to enable the dark scheme. */
 :root
   --background-body: #fff
   --background: #efefef
@@ -66,7 +63,7 @@ body
   margin: 20px auto
   padding: 0 10px
   color: var(--text-main)
-  font-family: "psinter", system-ui, -apple-system, "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif
   line-height: 1.5
   word-wrap: break-word
   background: var(--background-body)
@@ -79,28 +76,6 @@ input,
 textarea
   transition: background-color var(--animation-duration) linear, border-color var(--animation-duration) linear, color var(--animation-duration) linear, box-shadow var(--animation-duration) linear, transform var(--animation-duration) ease
 
-h1
-  margin-top: 0
-  font-size: 2.2em
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6
-  margin-top: 24px
-  margin-bottom: 12px
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-strong
-  color: var(--text-bright)
-
 h1,
 h2,
 h3,
@@ -111,6 +86,9 @@ b,
 strong,
 th
   font-weight: 600
+  color: var(--text-bright)
+  margin-top: 24px
+  margin-bottom: 12px
 
 q::before
   content: none
@@ -390,7 +368,7 @@ time
   padding: 2.5px 5px
   color: var(--code)
   font-size: 1em
-  font-family: "psjbmono", "Menlo", "Monaco", "Consolas", "Andale Mono", "Ubuntu Mono", "Courier New", monospace
+  font-family: "JetBrains Mono", "Menlo", "Monaco", "Consolas", "Andale Mono", "Ubuntu Mono", "Courier New", monospace
   background: var(--background)
   border-radius: 6px
 
