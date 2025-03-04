@@ -1,6 +1,6 @@
 # licss
 
-> gulp plugin. bundles, compiles and minifies sass, scss, css and postcss stylesheets with Lightning CSS and sass.
+> gulp plugin for style transformation - bundles, compiles, minimizes, rename and cleans up sass, scss, css, and postcss stylesheets with Lightning CSS and SASS API.
 > use it for bootsrtap 5.3.3 (for the stop warning, sass v.1.77.4 was used here)
 
 install:
@@ -27,12 +27,13 @@ options?: {
 
 - for source map files use { sourcemaps: true } / { sourcemaps: '.' } in gulp "src" and gulp "dest" functions (go to gulp docs)
 
+- if you need to rename a file, you can import the gulp function "rename" from licss.
+
 sample:
 
 ```
-import gulp from 'gulp'
-import licss from 'licss'
-const { src, dest } = gulp
+import { src, dest, series } from 'gulp'
+import licss, { rename } from 'licss'
 
 const purgecss = {
   content: ['src/*.html', 'src/assets/scripts/**/*.ts'],

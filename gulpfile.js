@@ -7,11 +7,8 @@ import typescript from '@rollup/plugin-typescript'
 import { rollup } from 'rollup'
 
 import { deleteAsync } from 'del'
-import rename from 'gulp-ren'
-import licss from './plugin/licss.js'
-
-import gulp from 'gulp'
-const { src, dest, series } = gulp
+import { src, dest, series } from 'gulp'
+import licss, { rename } from './plugin/licss.js'
 
 // variables & paths
 const purgecss = {
@@ -33,7 +30,7 @@ async function css() {
   await deleteAsync(['dist/css/*', 'dist/js/*'])
   copy(['src/*.html'])
   await scripts('src/assets/scripts/main.ts')
-  return src(['src/styles/css/main.css'], { sourcemaps: true })
+  return src(['src/styles/css/main.css'], { sourcemaps: false })
     .pipe(licss({ minify: true, purgeOptions: purgecss }))
     .pipe(dest('dist/css', { sourcemaps: '.' }))
 }

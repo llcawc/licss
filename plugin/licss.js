@@ -7,6 +7,12 @@ import { dirname, join, relative } from 'node:path';
 import { compileString } from 'sass';
 import { PurgeCSS } from 'purgecss';
 import * as glob from 'glob';
+import rename from './rename.js';
+export { rename };
+/**
+ * Gulp plugin for style transformation - bundles, compiles, minimizes, and cleans up sass, scss, css, and postcss style sheets.
+ * @param options
+ */
 export default function licss(options = { minify: undefined, loadPaths: undefined, purgeOptions: undefined }) {
     return through2.obj(async function (file, _, cb) {
         // empty

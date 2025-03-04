@@ -1,7 +1,7 @@
 {
   "name": "licss",
-  "version": "0.0.5",
-  "description": "gulp plugin. bundles, compiles and minifies sass, scss, css and postcss stylesheets. use it for bootsrtap 5.3.3 (for the stop warning, sass v.1.77.4 was used here). made by pasmurno from llcawc",
+  "version": "0.0.6",
+  "description": "gulp plugin. bundles, compiles, minimizes, rename and cleans up sass, scss, css, and postcss style sheets. use it for bootsrtap 5.3.3 (for the stop warning, sass v.1.77.4 was used here). made by pasmurno from llcawc",
   "keywords": [
     "gulp",
     "optimize",
@@ -69,6 +69,7 @@
     "browserslist": "^4.24.4",
     "glob": "^11.0.1",
     "lightningcss": "^1.29.1",
+    "plugin-error": "^2.0.1",
     "purgecss": "^7.0.2",
     "sass": "1.77.4",
     "through2": "^4.0.2",
