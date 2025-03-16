@@ -29,9 +29,11 @@
   text-decoration: none;
 
   background-color: transparent;
+
   &::after {
     color: boot.$textcolor;
   }
+
   svg {
     color: boot.$textcolor;
   }
@@ -42,7 +44,6 @@
   right: 0;
   left: auto;
 
-  min-height: 7rem;
   padding: .125rem;
   border-radius: .5rem;
 
@@ -53,6 +54,7 @@
   .dropdown-item {
     border-radius: .375rem;
     color: boot.$darkcolor;
+
     &:active {
       background-color: boot.$accent;
     }
@@ -62,6 +64,7 @@
     font-weight: 700;
     color: boot.$lightcolor;
     background-color: boot.$accent;
+
     .icon {
       display: block !important; // stylelint-disable-line declaration-no-important
     }

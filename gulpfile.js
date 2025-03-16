@@ -56,10 +56,10 @@ async function sass() {
   await deleteAsync(['dist/css/*', 'dist/js/*'])
   copy(['src/html/*.html'])
   await scripts('src/assets/scripts/script.ts')
-  return src(['src/styles/sass/main.sass'], { sourcemaps: true })
-    .pipe(licss({ minify: false }))
-    .pipe(rename({ suffix: '.min', extname: '.css' }))
-    .pipe(dest('dist/css', { sourcemaps: '.' }))
+  return src(['src/styles/sass/main.sass'])
+    .pipe(licss())
+    .pipe(rename({ suffix: '.min' }))
+    .pipe(dest('dist/css'))
 }
 
 // scripts task
@@ -73,7 +73,7 @@ async function scripts(src) {
       }),
       resolve(),
       commonjs({ include: 'node_modules/**' }),
-      babel({ babelHelpers: 'bundled' }),
+      babel({ presets: ['@babel/preset-env'], babelHelpers: 'bundled' }),
     ],
   })
   await bundle.write({

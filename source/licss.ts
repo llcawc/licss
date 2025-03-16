@@ -24,8 +24,7 @@ export default function licss(
     minify?: boolean | undefined
     loadPaths?: string[] | undefined
     purgeOptions?: UserDefinedOptions | undefined
-  } = { minify: undefined, loadPaths: undefined, purgeOptions: undefined }
-) {
+  } = {}) {
   return through2.obj(async function (file: File, _, cb) {
     // empty
     if (file.isNull()) {
@@ -38,7 +37,7 @@ export default function licss(
     }
     if (file.isBuffer()) {
       try {
-        const minify: boolean = !!options.minify // normalize boolean
+        const minify: boolean = options.minify ?? true // normalize boolean
         const sourceMap: boolean = !!file.sourceMap // normalize boolean
 
         // compile css, scss or sass files

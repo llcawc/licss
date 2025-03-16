@@ -14,7 +14,7 @@ export { rename };
  * Gulp plugin for style transformation - bundles, compiles, minimizes, and cleans up sass, scss, css, and postcss style sheets.
  * @param options
  */
-export default function licss(options = { minify: undefined, loadPaths: undefined, purgeOptions: undefined }) {
+export default function licss(options = {}) {
     return through2.obj(async function (file, _, cb) {
         // empty
         if (file.isNull()) {
@@ -27,7 +27,7 @@ export default function licss(options = { minify: undefined, loadPaths: undefine
         }
         if (file.isBuffer()) {
             try {
-                const minify = !!options.minify; // normalize boolean
+                const minify = options.minify ?? true; // normalize boolean
                 const sourceMap = !!file.sourceMap; // normalize boolean
                 // compile css, scss or sass files
                 if (file.extname === '.css' || file.extname === '.sass' || file.extname === '.scss') {
