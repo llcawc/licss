@@ -2,69 +2,53 @@
 
 html
   --cm-color: #232429
-  --cm-bg: #e4e4e7
+  --cm-bg: #ededed81
+  --cm-bg-hover: #e4e4e7eb
   --cm-focus: transparent /* rgba(92 173 214 / 70%) */
 
 html.dark
   --cm-color: #c9c9cf
-  --cm-bg: #37393f
+  --cm-bg: #ffffff10
+  --cm-bg-hover: #ffffff23
   --cm-focus: transparent /* rgba(0 136 204 / 70%) */
 
 .color-switcher
-  position: absolute
-  top: 25px
-  right: 20px
-  margin: 0
-  padding: 0
-  line-height: 0.8
-
-.color-switcher button
   display: flex
   align-items: center
   justify-content: center
-  width: 32px
-  height: 32px
-  margin: 0
+  width: 28px
+  height: 28px
+  min-width: 28px
+  max-height: 28px
+  margin: 8px
   padding: 0
-  background: transparent
+  background: var(--cm-bg)
   border: 0
   border-radius: 6px
   box-shadow: none
   cursor: pointer
   transition: 250ms
+  @media( width < 480px )
+    width: 36px
+    height: 36px
+    min-width: 36px
+    max-height: 36px
 
-.color-switcher button:hover
-  background: var(--cm-bg)
+.color-switcher:hover
+  background: var(--cm-bg-hover)
 
-.color-switcher button:focus,
-.color-switcher button:focus-visible
+.color-switcher:focus,
+.color-switcher:focus-visible
   outline: 0
   box-shadow: 0 0 0 2px var(--cm-focus)
 
-.color-switcher button svg
+.color-switcher svg
   display: block
-  width: 20px
-  height: 20px
+  width: 18px
+  height: 18px
   margin: 0
   padding: 0
   fill: var(--cm-color)
-
-@media (width >= 480px)
-  .color-switcher
-    right: calc(50% - 480px / 2 + 20px)
-
-@media (width >= 768px)
-  .color-switcher
-    right: calc(50% - 768px / 2 + 20px)
-
-@media (width >= 1024px)
-  .color-switcher
-    right: calc(50% - 1024px / 2 + 20px)
-
-@media (width >= 1280px)
-  .color-switcher
-    right: calc(50% - 1280px / 2 + 20px)
-
-/* hidden class */
-.hidden
-  display: none !important
+  @media( width < 480px )
+    width: 24px
+    height: 24px

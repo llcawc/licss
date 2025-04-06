@@ -5,11 +5,7 @@
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "rootDir": "./",
-    "outDir": "../plugin",
-    // "skipLibCheck": true,
-    // "resolveJsonModule": true,
-    // "removeComments": true,
-    // "sourceMap": true,
+    "outDir": "./",
     "declaration": true,
     "newLine": "lf",
     "strict": true,
@@ -20,6 +16,6 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["./"],
-  "exclude": ["../*.js", "./src/*"]
+  "include": ["./*"],
+  "exclude": ["*.js", "src/*"]
 }

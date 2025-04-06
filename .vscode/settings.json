@@ -19,7 +19,7 @@
   "vsicons.associations.files": [{ "icon": "postcss", "extensions": ["pcss"], "format": "svg" }],
   "vsicons.associations.folders": [{ "icon": "style", "extensions": ["pcss"], "format": "svg", "overrides": "pcss" }],
 
-  "stylelint.configFile": "css.stylelintrc.json",
+  "stylelint.configFile": ".stylelintrc.json",
 
   "stylelint.validate": ["scss", "css", "postcss"],
   "eslint.validate": ["typescript", "javascript"],

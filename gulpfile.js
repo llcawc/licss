@@ -7,8 +7,8 @@ import typescript from '@rollup/plugin-typescript'
 import { rollup } from 'rollup'
 
 import { deleteAsync } from 'del'
-import { src, dest, series } from 'gulp'
-import licss, { rename } from './plugin/licss.js'
+import { dest, series, src, watch } from 'gulp'
+import licss, { rename } from './index.js'
 
 // variables & paths
 const purgecss = {
@@ -93,7 +93,6 @@ async function clean() {
 function copy(source) {
   return src(source).pipe(dest('dist'))
 }
-
 // assets task
 function images() {
   return src(['src/assets/images/**/*.{ico,jpg,png,svg}'], { encoding: false }).pipe(dest('dist/images'))
@@ -111,6 +110,13 @@ function fonts() {
   ).pipe(dest('dist/fonts'))
 }
 
+function monitor() {
+  watch(['src/styles/css/**/*.css'], css)
+  watch(['src/styles/pcss/**/*.pcss'], pcss)
+  watch(['src/styles/scss/**/*.scss'], scss)
+  watch(['src/styles/sass/**/*.sass'], sass)
+}
+
 // export
-export { clean, images, fonts, sass, scss, css, pcss }
+export { clean, css, fonts, images, monitor, pcss, sass, scss }
 export const assets = series(clean, images, fonts)

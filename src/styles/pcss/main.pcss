@@ -2,3 +2,51 @@
 
 @import "./base.pcss";
 @import "./colormode.pcss";
+
+/* custom style */
+
+body {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: calc(100vh - 40px);
+}
+
+main {
+  flex-grow: 1;
+}
+
+.btn {
+  display: inline-flex;
+  gap: 0 4px;
+  align-items: center;
+
+  padding: 8px 24px;
+  border: 1px solid var(--links);
+  border-radius: 6px;
+
+  transition: all 0.2s;
+}
+
+.btn:hover {
+  color: #fff;
+  text-decoration: none;
+  background-color: var(--links);
+}
+
+footer {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+footer p {
+  margin: 0;
+}
+
+@media not (width >= 650px) {
+  footer {
+    align-items: start;
+  }
+}

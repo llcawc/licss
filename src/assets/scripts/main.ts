@@ -1,4 +1,3 @@
 // main.ts
 
-import colorSwitcher from './colormode'
-colorSwitcher()
+import './colormode'

@@ -5,7 +5,18 @@
 @import "fonts.css";
 @import "../libs/bootstrap-icons.css";
 
-/* custom code */
+/* custom style */
+
+body {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: calc(100vh - 40px);
+}
+
+main {
+  flex-grow: 1;
+}
 
 .btn {
   display: inline-flex;
@@ -17,10 +28,27 @@
   border-radius: 6px;
 
   transition: 200ms ease;
+}
 
-  &:hover {
-    color: white;
-    text-decoration: none;
-    background-color: var(--links);
+.btn:hover {
+  color: white;
+  text-decoration: none;
+  background-color: var(--links);
+}
+
+footer {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+footer p {
+  margin: 0;
+}
+
+@media not (width >=650px) {
+  footer {
+    align-items: start;
   }
 }
