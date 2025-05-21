@@ -1,7 +1,7 @@
 # licss
 
 > gulp plugin for style transformation - bundles, compiles, minimizes, rename and cleans up sass, scss, css, and postcss stylesheets with Lightning CSS and SASS API.
-> use it for bootsrtap 5.3.5 (for the stop warning, sass v.1.77.7 was used here)
+> use it for bootsrtap 5.3.6 (for the stop warning, sass v.1.78.0 was used here)
 
 install:
 

@@ -1,15 +1,15 @@
-import File from 'vinyl'
-import { Buffer } from 'node:buffer'
 import browserslist from 'browserslist'
-import through2 from 'through2'
-import PluginError from 'plugin-error'
-import { transform, bundle, browserslistToTargets, Targets } from 'lightningcss'
-import { RawSourceMap } from 'source-map'
-import { fileURLToPath, pathToFileURL } from 'node:url'
-import { dirname, join, relative } from 'node:path'
-import { compileString, OutputStyle, Syntax } from 'sass'
-import { PurgeCSS, UserDefinedOptions } from 'purgecss'
 import * as glob from 'glob'
+import { browserslistToTargets, bundle, Targets, transform } from 'lightningcss'
+import { Buffer } from 'node:buffer'
+import { dirname, join, relative } from 'node:path'
+import { fileURLToPath, pathToFileURL } from 'node:url'
+import PluginError from 'plugin-error'
+import { PurgeCSS, UserDefinedOptions } from 'purgecss'
+import { compileString, OutputStyle, Syntax } from 'sass'
+import { RawSourceMap } from 'source-map'
+import through2 from 'through2'
+import File from 'vinyl'
 
 import rename from './rename.js'
 export { rename }
@@ -24,7 +24,8 @@ export default function licss(
     minify?: boolean | undefined
     loadPaths?: string[] | undefined
     purgeOptions?: UserDefinedOptions | undefined
-  } = {}) {
+  } = {}
+) {
   return through2.obj(async function (file: File, _, cb) {
     // empty
     if (file.isNull()) {
@@ -40,7 +41,7 @@ export default function licss(
         const minify: boolean = options.minify ?? true // normalize boolean
         const sourceMap: boolean = !!file.sourceMap // normalize boolean
 
-        // compile css, scss or sass files
+        // compile scss or sass files
         if (file.extname === '.css' || file.extname === '.sass' || file.extname === '.scss') {
           const syntax: Syntax | undefined = file.extname === '.sass' ? 'indented' : 'scss'
           const style: OutputStyle | undefined = minify ? 'compressed' : 'expanded'
@@ -71,8 +72,8 @@ export default function licss(
           if (sourceMap && !!sassMap) {
             addSourceMap(file, sassMap, true)
           }
-          // transform code with lightningcss
-          if (!sourceMap) {
+          // transform code with lightningcss for production
+          if (!sourceMap && minify) {
             licssTransform(file, minify, sourceMap)
           }
         } else {
@@ -120,9 +121,12 @@ function licssTransform(file: File, minify: boolean, sourceMap: boolean) {
     // if need map
     if (sourceMap && !!map) {
       const mapContent = JSON.parse(map.toString())
-      mapContent.file = file.relative
-      mapContent.sourceRoot = ''
-      file.sourceMap = mapContent
+      // mapContent.file = file.relative
+      // mapContent.sourceRoot = ''
+      // file.sourceMap = mapContent
+
+      // add map in to file
+      addSourceMap(file, mapContent, true)
     }
   }
 }
@@ -150,9 +154,7 @@ function licssBundle(file: File, minify: boolean, sourceMap: boolean) {
     // add map in file
     if (sourceMap && !!map) {
       const mapContent = JSON.parse(map.toString())
-      mapContent.file = file.relative
-      mapContent.sourceRoot = ''
-      file.sourceMap = mapContent
+      addSourceMap(file, mapContent, true)
     }
   }
 }

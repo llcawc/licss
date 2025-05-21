@@ -1,13 +1,13 @@
-import { Buffer } from 'node:buffer';
 import browserslist from 'browserslist';
-import through2 from 'through2';
-import PluginError from 'plugin-error';
-import { transform, bundle, browserslistToTargets } from 'lightningcss';
-import { fileURLToPath, pathToFileURL } from 'node:url';
-import { dirname, join, relative } from 'node:path';
-import { compileString } from 'sass';
-import { PurgeCSS } from 'purgecss';
 import * as glob from 'glob';
+import { browserslistToTargets, bundle, transform } from 'lightningcss';
+import { Buffer } from 'node:buffer';
+import { dirname, join, relative } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import PluginError from 'plugin-error';
+import { PurgeCSS } from 'purgecss';
+import { compileString } from 'sass';
+import through2 from 'through2';
 import rename from './rename.js';
 export { rename };
 /**
@@ -29,7 +29,7 @@ export default function licss(options = {}) {
             try {
                 const minify = options.minify ?? true; // normalize boolean
                 const sourceMap = !!file.sourceMap; // normalize boolean
-                // compile css, scss or sass files
+                // compile scss or sass files
                 if (file.extname === '.css' || file.extname === '.sass' || file.extname === '.scss') {
                     const syntax = file.extname === '.sass' ? 'indented' : 'scss';
                     const style = minify ? 'compressed' : 'expanded';
@@ -54,13 +54,13 @@ export default function licss(options = {}) {
                     if (sourceMap && !!sassMap) {
                         addSourceMap(file, sassMap, true);
                     }
-                    // transform code with lightningcss
-                    if (!sourceMap) {
+                    // transform code with lightningcss for production
+                    if (!sourceMap && minify) {
                         licssTransform(file, minify, sourceMap);
                     }
                 }
                 else {
-                    // compile postcss file
+                    // compile css and postcss file
                     licssBundle(file, minify, sourceMap);
                 }
                 // purgecss
@@ -101,9 +101,11 @@ function licssTransform(file, minify, sourceMap) {
         // if need map
         if (sourceMap && !!map) {
             const mapContent = JSON.parse(map.toString());
-            mapContent.file = file.relative;
-            mapContent.sourceRoot = '';
-            file.sourceMap = mapContent;
+            // mapContent.file = file.relative
+            // mapContent.sourceRoot = ''
+            // file.sourceMap = mapContent
+            // add map in to file
+            addSourceMap(file, mapContent, true);
         }
     }
 }
@@ -127,9 +129,7 @@ function licssBundle(file, minify, sourceMap) {
         // add map in file
         if (sourceMap && !!map) {
             const mapContent = JSON.parse(map.toString());
-            mapContent.file = file.relative;
-            mapContent.sourceRoot = '';
-            file.sourceMap = mapContent;
+            addSourceMap(file, mapContent, true);
         }
     }
 }
