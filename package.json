@@ -1,6 +1,6 @@
 {
   "name": "licss",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "gulp plugin. bundles, compiles, minimizes, rename and cleans up sass, scss, css, and postcss style sheets. use it for bootsrtap 5.3.7 (for the stop warning, sass v.1.78.0 was used here). made by pasmurno from llcawc",
   "keywords": [
     "gulp",
