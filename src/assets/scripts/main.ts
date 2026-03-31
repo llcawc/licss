@@ -1,3 +1,0 @@
-// main.ts
-
-import './colormode'

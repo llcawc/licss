@@ -1,7 +1,5 @@
 # Node & project folders
 /.git/
-/.osp/
-/dist/
 /node_modules/
 /**/debug.log
 /**/yarn.lock
