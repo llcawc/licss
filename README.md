@@ -1,208 +1,147 @@
 # licss
 
-Gulp plugin for processing styles with support for `.css`, `.scss`, `.sass`, and `.pcss` files. Optimizes, minifies, and removes unused CSS with PurgeCSS integration. Supports Bootstrap and other frameworks. Optimized for Bootstrap 5.3+ (Sass 1.78.0)
+Gulp plugin "licss" designed for style transformation workflows, and supported `.css`, `.scss`, `.sass` and `.pcss` files. You can use it to process Bootsrtap framework CSS files (sass version 1.78.0 was used here for the stop warning).
 
-## Features
+Its main features include:
 
-### 1. Compiler Selection
+1. #### Compiler Selection
 
-Uses either [SASS/SCSS](https://github.com/sass/embedded-host-node) (Embedded Sass Host) or [LightningCSS](https://github.com/parcel-bundler/lightningcss) (from Parcel) depending on the `compiler` option.
+The plugin uses the [SASS/SCSS](https://github.com/sass) (Dart SASS) or [LightningCSS](https://github.com/parcel-bundler/lightningcss) (from Parcel) compiler for CSS files depending on the configuration (options "compiler"). LightningCSS is then used for CSS concatenation/minification, including compatibility with target browsers (via browserslist).
 
-All files support importing styles via `@import`.
+CSS, SASS and SCSS style files are first processed by the SASS processor, with import entries pre-set in the files. The LightningCSS compiler is used for post-processing. For other style files with extensions other than SASS, SCSS and CSS (e.g. postcss style files), only LightningCSS processing is used.
 
-### 2. Minification + Autoprefixer
+All files can use the import of style files with the `@import`.
 
-LightningCSS performs CSS concatenation and minification, including automatic vendor prefixing based on browserslist.
+To create source map files, you need to use the `src()` and `dest()` functions option, details in the GALP documentation.
 
-### 3. PurgeCSS Integration
+2. #### Post-Processing
 
-Removes unused CSS via PurgeCSS. PurgeCSS configuration is set through the `purgeCSSoptions` option. See documentation on the [PurgeCSS](https://purgecss.com/) website.
+Supports options like:
 
-### 4. Source Map Management
+- full: Minify + Autoprefixer
+- minify: Only minify CSS
+- autoprefixer: Add vendor prefixes
+- none: Skip post-processing
 
-Generates/updates source maps for debugging (controlled by the `sourcemaps` flag in Gulp). Normalizes paths in maps for cross‑platform consistency.
+For browser support, use the browserlist settings, the default settings are `"> 0.2%, last 2 major versions, not dead"`.
 
-### 5. Validation & Error Handling
+3. #### PurgeCSS Integration
 
-Validates file extensions, compiler/post‑processing options, and load paths. Throws descriptive errors for unsupported inputs.
+Removes unused CSS in production builds (via purgeTransform). Respects content globs and skippedContentGlobs for pruning. If the PurgeCSS option is enabled, a new source map is created after purging the file.
 
-### 6. File Renaming
+You can create a configuration for PurgeCSS use [this](https://purgecss.com/configuration.html) docunentation.
 
-The plugin includes a `rename` utility for flexible file naming:
+4. #### Source Map Management
 
-```javascript
-import { rename } from "licss";
+Generates/updates source maps for debugging (controlled by sourceMap flag). Normalizes paths in maps for cross-platform consistency.
 
-// Change basename (file stem and file extension, or without file extension)
-.pipe(rename({ basename: "main.css" }))
+5. #### Validation & Error Handling
 
-// Add suffix
-.pipe(rename({ suffix: ".min" }))
+Validates file extensions, compiler/postprocess options, and load paths. Throws descriptive errors for unsupported inputs.
 
-// Change extension
-.pipe(rename({ extname: ".css" }))
+6. #### Rename files
 
-// Combine options
-.pipe(rename({ basename: "main", suffix: ".min", extname: ".css" }))
+if you need to rename a file, you can import the gulp function "rename" from licss
+
+### install:
+
+```
+npm add -D licss
 ```
 
-## Quick Start
+options:
 
-### Installation
-
-```sh
-pnpm add -D licss
 ```
-
-or
-
-```sh
-npm install --save-dev licss
-```
-
-or
-
-```sh
-yarn add -D licss
-```
-
-### Basic Usage
-
-```js
-// import modules
-import { dest, src } from "gulp";
-import { licss, rename } from "licss";
-// sample task for CSS files
-function styles() {
-  return src(["src/styles/main.css"], { sourcemaps: true })
-    .pipe(
-      licss({
-        purgeCSSoptions: {
-          content: ["src/*.html", "src/scripts/*.ts"],
-        },
-      }),
-    )
-    .pipe(rename({ suffix: ".min", extname: ".css" }))
-    .pipe(dest("dist/css", { sourcemaps: "." })); // for file sourcemap
-  // or .. { sourcemaps: true } for inline sourcemap
-}
-// export
-export { styles };
-```
-
-## Configuration
-
-### Options
-
-```ts
-interface LicssOptions {
-  compiler?: "sass" | "lightningcss" | undefined;
-  minify?: boolean | undefined;
-  loadPaths?: string[] | undefined;
-  purgeCSSoptions?: UserDefinedOptions | undefined;
-  verbose?: boolean | undefined;
+options?: {
+    compiler?: 'sass' | 'lightningcss' // use SASS/SCSS or LightningCSS compiler for CSS files
+    postprocess?: 'full' | 'minify' | 'autoprefixer' | 'none' // Post-Processing via LightningCSS
+    loadPaths?: string[]  // paths for files to imports for SASS/SCSS compiler
+    purgeOptions?: UserDefinedOptions  // remove unused CSS from file - options PurgeCSS
+    silent?: boolean // enable/disable information messages about the progress of the compilation process
 }
 ```
 
-### Default Values
+default options:
 
-```ts
+```
 {
-    compiler: 'lightningcss',
-    minify: true,
-    loadPaths: [dirname(file.path), join(file.cwd, 'node_modules')],
-    purgeCSSoptions: undefined,
-    verbose: false,
+    compiler: 'sass',
+    postprocess: 'full',
+    loadPaths: [dirname(file.path), join(file.cwd, 'node_modules')]
+    purgeOptions: null,
+    silent: true // disable
 }
 ```
 
-## Examples
+### sample:
 
-### Processing CSS Files with SASS processor
+```
+import { src, dest, series } from 'gulp'
+import licss, { rename } from 'licss'
 
-```ts
-import { src, dest } from "gulp";
-import { licss } from "licss";
+const purgecss = {
+  content: ['src/*.html', 'src/assets/scripts/**/*.ts'],
+}
 
+// sample task for css files
 function css() {
-  return src(["src/styles/*.css"], { sourcemaps: true })
-    .pipe(licss({ compiler: "sass", minify: false }))
-    .pipe(dest("dist/css", { sourcemaps: "." }));
+  return src(['src/styles/*.css'], { sourcemaps: true })
+    .pipe(licss({
+        silent: false,
+        compiler: 'lightningcss',
+        postprocess: 'minify',
+        purgeOptions: purgecss,
+      }))
+    .pipe(dest('dist/css', { sourcemaps: '.' }))
 }
-```
 
-### Processing SASS/SCSS with PurgeCSS
-
-```ts
+// sample task for sass files
 function sass() {
-  return src(["src/sass/*.{sass,scss}"], { sourcemaps: true })
-    .pipe(
-      licss({
-        minify: false,
-        purgeCSSoptions: {
+  return src(['src/sass/*.{sass,scss}'], { sourcemaps: true })
+    .pipe(licss({
+        silent: false,
+        postprocess: 'full',
+        purgeOptions: {
           content: [
-            "src/**/*.html",
-            "src/assets/scripts/**/*.ts",
-            "node_modules/bootstrap/js/dist/**/*.js",
+            'src/sass/*.html',
+            'src/assets/scripts/**/*.ts',
+            'node_modules/bootstrap/js/dist/dom/*.js',
+            'node_modules/bootstrap/js/dist/dropdown.js',
           ],
           safelist: [/show/],
           keyframes: true,
         },
-      }),
-    )
-    .pipe(rename({ suffix: ".min", extname: ".css" }))
-    .pipe(dest("dist/css", { sourcemaps: "." }));
+      }))
+    .pipe(dest('dist/css', { sourcemaps: '.' }))
 }
-```
 
-### Processing PostCSS Files
-
-```ts
+// sample task for postcss files
 function pcss() {
-  return src(["src/pcss/styles/main.pcss"], { sourcemaps: true })
-    .pipe(
-      licss({
-        purgeCSSoptions: {
-          content: ["src/pcss/*.html", "src/assets/scripts/**/*.ts"],
+  return src(['src/pcss/styles/main.pcss'], { sourcemaps: true })
+    .pipe(licss({
+        silent: false,
+        postprocess: 'autoprefixer',
+        purgeOptions: {
+          content: ['src/pcss/*.html', 'src/assets/scripts/**/*.ts'],
         },
-      }),
-    )
-    .pipe(rename({ suffix: ".min", extname: ".css" }))
-    .pipe(dest("dist/css", { sourcemaps: true }));
+      }))
+    .pipe(rename({ suffix: '.min', extname: '.css' }))
+    .pipe(dest('dist/css', { sourcemaps: '.' }))
 }
-```
 
-### Processing SCSS with Minification
-
-```ts
-function scss() {
-  return src(["src/scss/style.scss"])
-    .pipe(licss())
-    .pipe(rename({ basename: "main.min.css" }))
-    .pipe(dest("dist/css"));
+// sample task for scss files
+function scss(cb) {
+  src(['src/scss/main.scss'], { sourcemaps: true })
+    .pipe(licss({ postprocess: 'minify' }))
+    .pipe(rename({ suffix: '.min', extname: '.css' }))
+    .pipe(dest('dist/css', { sourcemaps: '.' }))
+  cb()
+  return
 }
+
+export { css, sass, pcss, scss }
 ```
 
-## Types
+---
 
-The plugin exports the following TypeScript types:
-
-```ts
-import type { LicssOptions, RenameOptions, UserDefinedOptions } from "licss";
-```
-
-- `LicssOptions` – options for the `licss()` function
-- `RenameOptions` – options for the built‑in `rename()` function (compatible with `gulp‑rename`)
-- `UserDefinedOptions` – PurgeCSS options type (re‑exported from `purgecss`)
-
-### Project Scripts
-
-- `pnpm test` – run Vitest tests
-- `pnpm lint` – lint code with oxlint
-- `pnpm fmt` – format code with oxfmt
-- `pnpm build` – build TypeScript to JavaScript
-- `pnpm dev` – build in watch mode
-
-## License
-
-MIT License ©2026 by pasmurno from [llcawc](https://github.com/llcawc). Made with <span style="color:red;">❤</span> to beautiful architecture.
+MIT License ©2025 by pasmurno from [llcawc](https://github.com/llcawc). Made with <span style="color:red;">❤</span> to beautiful architecture.

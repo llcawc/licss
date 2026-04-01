@@ -1,0 +1,7 @@
+/* main.css */
+
+@import "blocks/style.css";
+@import "./blocks/custom.css";
+@import "./blocks/colormode.css";
+@import url("../libs/fonts.css");
+@import url("../libs/bootstrap-icons.css");
