@@ -1,6 +1,6 @@
 {
   "name": "licss",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Gulp plugin 'licss' designed for style transformation workflows, and supported .css, .scss, .sass and .pcss files. You can use it to process Bootsrtap framework CSS files (sass version 1.78.0 was used here for the stop warning)",
   "keywords": [
     "gulp",
