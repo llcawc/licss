@@ -1,6 +1,6 @@
 {
   "name": "licss",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Gulp plugin 'licss' designed for style transformation workflows, and supported .css, .scss, .sass and .pcss files. You can use it to process Bootsrtap framework CSS files (sass version 1.78.0 was used here for the stop warning)",
   "keywords": [
     "gulp",
@@ -52,9 +52,9 @@
     "@types/gulp": "^4.0.18",
     "@types/node": "^25.5.0",
     "@types/vinyl": "^2.0.12",
-    "@typescript/native-preview": "7.0.0-dev.20260330.1",
-    "oxfmt": "^0.42.0",
-    "oxlint": "^1.57.0",
+    "@typescript/native-preview": "7.0.0-dev.20260401.1",
+    "oxfmt": "^0.43.0",
+    "oxlint": "^1.58.0",
     "source-map": "^0.7.6",
     "tsdown": "^0.21.7",
     "typescript": "^6.0.2",
@@ -62,7 +62,7 @@
     "vitest": "^4.1.2"
   },
   "dependencies": {
-    "browserslist": "^4.28.1",
+    "browserslist": "^4.28.2",
     "colors": "^1.4.0",
     "fancy-log": "^2.0.0",
     "lightningcss": "^1.32.0",

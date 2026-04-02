@@ -3,7 +3,6 @@ import { UserDefinedOptions } from "purgecss";
 
 //#region src/licss.d.ts
 interface LicssOptions {
-  compiler?: 'sass' | 'lightningcss' | undefined;
   minify?: boolean | undefined;
   loadPaths?: string[] | undefined;
   purgeCSSoptions?: UserDefinedOptions | undefined;
@@ -16,7 +15,6 @@ interface RenameOptions {
 }
 /**
  * Gulp plugin for style transformation - bundles, compiles, minimizes, and cleans up sass, scss, css, and postcss style sheets.
- * @param compiler use SASS/SCSS or LightningCSS compiler for CSS files
  * @param minify use LightningCSS for minify CSS files
  * @param loadPaths paths for files to imports for SASS/SCSS compiler
  * @param purgeCSSoptions remove unused CSS from file - options PurgeCSS
@@ -49,7 +47,6 @@ interface RenameOptions {
  * ```
  */
 declare function licss({
-  compiler,
   minify,
   loadPaths,
   purgeCSSoptions,

@@ -14,7 +14,6 @@ import { glob } from "tinyglobby";
 const textDecoder = new TextDecoder();
 /**
 * Gulp plugin for style transformation - bundles, compiles, minimizes, and cleans up sass, scss, css, and postcss style sheets.
-* @param compiler use SASS/SCSS or LightningCSS compiler for CSS files
 * @param minify use LightningCSS for minify CSS files
 * @param loadPaths paths for files to imports for SASS/SCSS compiler
 * @param purgeCSSoptions remove unused CSS from file - options PurgeCSS
@@ -46,7 +45,7 @@ const textDecoder = new TextDecoder();
 *
 * ```
 */
-function licss({ compiler = "lightningcss", minify = true, loadPaths, purgeCSSoptions, verbose = false } = {}) {
+function licss({ minify = true, loadPaths, purgeCSSoptions, verbose = false } = {}) {
 	const stream = new Transform({ objectMode: true });
 	stream._transform = async (file, _enc, cb) => {
 		if (file.isNull()) return cb(null, file);
@@ -55,28 +54,26 @@ function licss({ compiler = "lightningcss", minify = true, loadPaths, purgeCSSop
 		if (file.isBuffer()) try {
 			if (!loadPaths) loadPaths = [dirname(file.path), join(file.cwd, "node_modules")];
 			const extname = file.extname.split(".").pop()?.toLowerCase() ?? "";
-			if (!/^(css|scss|sass|pcss)$/i.test(extname)) throw new Error("• \"licss\": Unsupported file extension. Supported: .css, .scss, .sass, .pcss");
-			if (!/^(sass|lightningcss)$/i.test(compiler)) throw new Error("• \"licss\": Unsupported \"compiler\" option.\nSupported: \"sass\", \"lightningcss\" or undefined. Default: \"sass\"");
+			if (!/^(css|scss|sass|pcss|postcss)$/i.test(extname)) throw new Error("• \"licss\": Unsupported file extension. Supported: .css, .scss, .sass, .pcss");
 			const targetsList = getTargets(file.cwd);
+			const isPcssFile = /^(pcss|postcss)$/i.test(extname);
 			const isPurge = !!purgeCSSoptions;
 			const isSourceMap = file.sourceMap ? true : false;
-			const isCssFile = /^css$/i.test(extname);
-			const isSassFile = /^(sass|scss)$/i.test(extname);
-			if (verbose) mess(`options: compiler: ${compiler}, minify: ${minify}, purge: ${isPurge}, sourcemap: ${isSourceMap}, file:`, file);
-			if (isSassFile || isCssFile && compiler === "sass") {
+			if (verbose) mess(`Options: minify: ${minify}, sourcemap: ${isSourceMap}, purge: ${isPurge}, file:`, file);
+			if (isPcssFile) {
+				if (verbose) mess("Run bundle LightningCSS for file:", file);
+				bundleLightningCSS(file, isSourceMap);
+			} else {
 				if (verbose) mess("Run SASS compiler for file:", file);
 				await bundleSASS(file, loadPaths, isSourceMap);
-				if (minify) {
-					if (verbose) mess("LightningCSS minify file:", file);
-					await transformLightningCSS(file, minify, targetsList, isSourceMap);
-				}
-			} else {
-				if (verbose) mess("Run LightningCSS Bundle compiler for file:", file);
-				await bundleLightningCSS(file, minify, targetsList, isSourceMap);
 			}
 			if (isPurge) {
 				if (verbose) mess("Purge unused CSS in file:", file);
-				await purgeTransform(file, purgeCSSoptions, isSourceMap);
+				await purgeTransform(file, purgeCSSoptions);
+			}
+			if (!purgeCSSoptions?.rejected) {
+				if (verbose) mess("Run transform LightningCSS for file:", file);
+				transformLightningCSS(file, minify, targetsList, isSourceMap, isPurge);
 			}
 			cb(null, file);
 		} catch (err) {
@@ -95,30 +92,31 @@ function mess(message, file) {
 function getTargets(cwd) {
 	return browserslistToTargets(browserslist(browserslist.loadConfig({ path: cwd }) ?? browserslist("> 0.2%, last 2 major versions, not dead")));
 }
-async function transformLightningCSS(file, minify, targetsList, isSourceMap) {
+function transformLightningCSS(file, minify, targetsList, isSourceMap, isPurge) {
 	if (file.isBuffer()) {
 		const result = transform({
-			targets: minify ? targetsList : void 0,
-			filename: file.basename,
+			filename: file.path,
 			minify,
-			inputSourceMap: isSourceMap ? JSON.stringify(file.sourceMap) : void 0,
-			sourceMap: isSourceMap,
 			code: file.contents,
-			projectRoot: file.base
+			sourceMap: isSourceMap,
+			inputSourceMap: isPurge ? void 0 : isSourceMap ? JSON.stringify(file.sourceMap) : void 0,
+			projectRoot: file.cwd,
+			targets: minify ? targetsList : void 0
 		});
 		file.extname = ".css";
 		file.contents = Buffer.from(result.code);
 		if (result.map) file.sourceMap = JSON.parse(textDecoder.decode(result.map));
 	} else throw new Error("transformLightningCSS: File not found!");
 }
-async function bundleLightningCSS(file, minify, targetsList, isSourceMap) {
+function bundleLightningCSS(file, isSourceMap) {
 	if (file.isBuffer()) {
 		const result = bundle({
-			targets: minify ? targetsList : void 0,
 			filename: file.path,
-			minify,
+			minify: false,
 			sourceMap: isSourceMap,
-			projectRoot: file.base
+			inputSourceMap: void 0,
+			projectRoot: file.cwd,
+			targets: void 0
 		});
 		file.extname = ".css";
 		file.contents = Buffer.from(result.code);
@@ -138,7 +136,7 @@ async function bundleSASS(file, loadPaths, isSourceMap) {
 		file.contents = Buffer.from(result.css);
 		if (result.sourceMap && isSourceMap) cleanSourceMap(file, JSON.parse(JSON.stringify(result.sourceMap)));
 	} catch (err) {
-		throw new PluginError("lscss", err instanceof Error ? err : new Error(String(err)), {
+		throw new PluginError("licss", err instanceof Error ? err : new Error(String(err)), {
 			message: "Error! Sass compiler: ",
 			fileName: file.path,
 			showStack: true
@@ -163,29 +161,21 @@ function parseImport(file) {
 	if (file.isBuffer()) return textDecoder.decode(file.contents).replace(/@import +([url(]*)["']([./]*)([a-z-_/]+)\.?(.*)['"]\)?/gi, "@import \"$2$3\"");
 	else throw new Error("parseImport: File not found!");
 }
-async function purgeTransform(file, options, isSourceMap) {
+async function purgeTransform(file, options) {
 	if (!options || typeof options !== "object" || Array.isArray(options)) throw new Error("Error! Check the type PurgeCSS options.");
 	if (!options.content || !Array.isArray(options.content) || options.content.length === 0) throw new Error("Error! PurgeCSS requires a non-empty \"content\" array.");
 	if (file.isBuffer()) {
-		const mapOptions = {
-			inline: false,
-			annotation: false,
-			prev: isSourceMap ? file.sourceMap : false,
-			sourcesContent: true
-		};
 		const processedContent = await getFiles(options.content, options.skippedContentGlobs);
 		const purge = (await new PurgeCSS().purge({
 			...options,
 			content: processedContent,
 			css: [{ raw: textDecoder.decode(file.contents) }],
 			stdin: true,
-			sourceMap: mapOptions
+			sourceMap: false
 		}))[0];
 		const rejected = options.rejected && purge.rejected && purge.rejected.length > 0 ? purge.rejected.join(" {}\n") + " {}" : "";
 		const result = rejected ? rejected : purge.css;
 		file.contents = Buffer.from(result, "utf8");
-		if (isSourceMap) if (purge.sourceMap) file.sourceMap = JSON.parse(purge.sourceMap);
-		else log(colors.yellow("licss ") + colors.red("⚠ ") + colors.magenta("Source map not generated by PurgeCSS for file: ") + colors.blue(file.relative));
 	} else throw new Error("purgeTransform: File not found!");
 }
 /**
@@ -198,6 +188,7 @@ function rename({ basename = void 0, extname = void 0, suffix = void 0 } = {}) {
 	const stream = new Transform({ objectMode: true });
 	stream._transform = async (sameFile, _enc, callback) => {
 		if (sameFile.isNull()) return callback(null, sameFile);
+		if (sameFile.isStream()) return callback(new PluginError("licss", "Streams are not supported"));
 		if (sameFile.isBuffer()) try {
 			const file = sameFile.clone({ contents: false });
 			if (basename) file.basename = basename;

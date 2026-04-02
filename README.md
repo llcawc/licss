@@ -6,7 +6,7 @@ Gulp plugin for processing styles with support for `.css`, `.scss`, `.sass`, and
 
 ### 1. Compiler Selection
 
-Uses either [SASS/SCSS](https://github.com/sass/embedded-host-node) (Embedded Sass Host) or [LightningCSS](https://github.com/parcel-bundler/lightningcss) (from Parcel) depending on the `compiler` option.
+Uses either [SASS/SCSS](https://github.com/sass/embedded-host-node) (Embedded Sass Host) and [LightningCSS](https://github.com/parcel-bundler/lightningcss) (from Parcel) for minify.
 
 All files support importing styles via `@import`.
 
@@ -30,21 +30,11 @@ Validates file extensions, compiler/post‑processing options, and load paths. T
 
 The plugin includes a `rename` utility for flexible file naming:
 
-```javascript
-import { rename } from "licss";
+- `basename` – replace the entire file name (including extension)
+- `extname` – change the file extension (e.g., `.css`)
+- `suffix` – add a suffix before the extension (e.g., `.min`)
 
-// Change basename (file stem and file extension, or without file extension)
-.pipe(rename({ basename: "main.css" }))
-
-// Add suffix
-.pipe(rename({ suffix: ".min" }))
-
-// Change extension
-.pipe(rename({ extname: ".css" }))
-
-// Combine options
-.pipe(rename({ basename: "main", suffix: ".min", extname: ".css" }))
-```
+The utility is compatible with `gulp‑rename` and can be used in the same pipeline.
 
 ## Quick Start
 
@@ -80,6 +70,7 @@ function styles() {
         purgeCSSoptions: {
           content: ["src/*.html", "src/scripts/*.ts"],
         },
+        verbose: true, // process progress messages
       }),
     )
     .pipe(rename({ suffix: ".min", extname: ".css" }))
@@ -96,7 +87,6 @@ export { styles };
 
 ```ts
 interface LicssOptions {
-  compiler?: "sass" | "lightningcss" | undefined;
   minify?: boolean | undefined;
   loadPaths?: string[] | undefined;
   purgeCSSoptions?: UserDefinedOptions | undefined;
@@ -108,7 +98,6 @@ interface LicssOptions {
 
 ```ts
 {
-    compiler: 'lightningcss',
     minify: true,
     loadPaths: [dirname(file.path), join(file.cwd, 'node_modules')],
     purgeCSSoptions: undefined,
@@ -118,7 +107,7 @@ interface LicssOptions {
 
 ## Examples
 
-### Processing CSS Files with SASS processor
+### Processing CSS Files
 
 ```ts
 import { src, dest } from "gulp";
@@ -126,7 +115,7 @@ import { licss } from "licss";
 
 function css() {
   return src(["src/styles/*.css"], { sourcemaps: true })
-    .pipe(licss({ compiler: "sass", minify: false }))
+    .pipe(licss({ minify: false }))
     .pipe(dest("dist/css", { sourcemaps: "." }));
 }
 ```
@@ -199,9 +188,14 @@ import type { LicssOptions, RenameOptions, UserDefinedOptions } from "licss";
 
 - `pnpm test` – run Vitest tests
 - `pnpm lint` – lint code with oxlint
+- `pnpm fix` – automatically fix lint issues
+- `pnpm check` – check code formatting without changes
 - `pnpm fmt` – format code with oxfmt
-- `pnpm build` – build TypeScript to JavaScript
+- `pnpm validate` – run lint and TypeScript type check
+- `pnpm typecheck` – TypeScript type check only
+- `pnpm tsc` – alias for `typecheck`
 - `pnpm dev` – build in watch mode
+- `pnpm build` – build TypeScript to JavaScript
 
 ## License
 
