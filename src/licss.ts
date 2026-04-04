@@ -226,6 +226,7 @@ async function bundleSASS(file: File, loadPaths: string[], isSourceMap: boolean)
         syntax: file.extname === '.sass' ? 'indented' : 'scss',
         sourceMap: isSourceMap,
         sourceMapIncludeSources: true,
+        silenceDeprecations: ['import', 'color-functions', 'global-builtin', 'legacy-js-api', 'if-function'],
       })
 
       file.extname = '.css'

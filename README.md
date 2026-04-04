@@ -1,26 +1,28 @@
 # licss
 
-Gulp plugin for processing styles with support for `.css`, `.scss`, `.sass`, and `.pcss` files. Optimizes, minifies, and removes unused CSS with PurgeCSS integration. Supports Bootstrap and other frameworks. Optimized for Bootstrap 5.3+ (Sass 1.78.0)
+Gulp plugin for processing styles with support for `.css`, `.scss`, `.sass`, and `.pcss` files. Optimizes, minifies, and removes unused CSS via PurgeCSS integration. Supports Bootstrap and other frameworks. Optimized for Bootstrap 5.3+ (uses Dart Sass 1.99.0)
 
 ## Features
 
 ### 1. Compiler Selection
 
-Uses either [SASS/SCSS](https://github.com/sass/embedded-host-node) (Embedded Sass Host) and [LightningCSS](https://github.com/parcel-bundler/lightningcss) (from Parcel) for minify.
+Uses either [Sass/SCSS](https://github.com/sass/embedded-host-node) (Embedded Sass Host) for compilation and [LightningCSS](https://github.com/parcel-bundler/lightningcss) (from Parcel) for minification.
 
-All files support importing styles via `@import`.
+All file types support style imports via `@import`.
+
+**Deprecation warnings silenced**: The following Sass compiler deprecations are automatically silenced: `import`, `color-functions`, `global-builtin`, `legacy-js-api`, `if-function`
 
 ### 2. Minification + Autoprefixer
 
-LightningCSS performs CSS concatenation and minification, including automatic vendor prefixing based on browserslist.
+LightningCSS handles CSS concatenation and minification, including automatic vendor prefixing based on browserslist.
 
 ### 3. PurgeCSS Integration
 
-Removes unused CSS via PurgeCSS. PurgeCSS configuration is set through the `purgeCSSoptions` option. See documentation on the [PurgeCSS](https://purgecss.com/) website.
+Removes unused CSS via PurgeCSS. PurgeCSS configuration is provided via the `purgeCSSoptions` option. Refer to the [PurgeCSS](https://purgecss.com/) documentation for details.
 
 ### 4. Source Map Management
 
-Generates/updates source maps for debugging (controlled by the `sourcemaps` flag in Gulp). Normalizes paths in maps for cross‑platform consistency.
+Generates or updates source maps for debugging (controlled by Gulp's `sourcemaps` flag). Normalizes paths in source maps for cross‑platform consistency.
 
 ### 5. Validation & Error Handling
 
@@ -70,12 +72,12 @@ function styles() {
         purgeCSSoptions: {
           content: ["src/*.html", "src/scripts/*.ts"],
         },
-        verbose: true, // process progress messages
+        verbose: true, // display processing progress messages
       }),
     )
     .pipe(rename({ suffix: ".min", extname: ".css" }))
-    .pipe(dest("dist/css", { sourcemaps: "." })); // for file sourcemap
-  // or .. { sourcemaps: true } for inline sourcemap
+    .pipe(dest("dist/css", { sourcemaps: "." })); // for external source maps
+  // or `{ sourcemaps: true }` for inline source maps
 }
 // export
 export { styles };
@@ -120,7 +122,7 @@ function css() {
 }
 ```
 
-### Processing SASS/SCSS with PurgeCSS
+### Processing Sass/SCSS with PurgeCSS
 
 ```ts
 function sass() {
@@ -199,4 +201,4 @@ import type { LicssOptions, RenameOptions, UserDefinedOptions } from "licss";
 
 ## License
 
-MIT License ©2026 by pasmurno from [llcawc](https://github.com/llcawc). Made with <span style="color:red;">❤</span> to beautiful architecture.
+MIT License ©2026 by pasmurno from [llcawc](https://github.com/llcawc). Made with <span style="color:red;">❤</span> for beautiful architecture.

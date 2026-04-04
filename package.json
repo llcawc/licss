@@ -1,26 +1,33 @@
 {
   "name": "licss",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Gulp plugin 'licss' designed for style transformation workflows, and supported .css, .scss, .sass and .pcss files. You can use it to process Bootsrtap framework CSS files (sass version 1.78.0 was used here for the stop warning)",
   "keywords": [
-    "gulp",
-    "optimize",
+    "bootstrap",
     "bundle",
-    "minify",
-    "purge",
-    "styles",
     "css",
+    "gulp",
+    "minify",
+    "optimize",
+    "pcss",
+    "purge",
     "sass",
     "scss",
-    "pcss",
-    "bootstrap"
+    "styles"
   ],
+  "homepage": "https://github.com/llcawc/licss",
   "license": "MIT",
   "author": "llcawc",
-  "homepage": "https://github.com/llcawc/licss",
+  "files": [
+    "dist",
+    "package.json",
+    "LICENSE",
+    "README.md"
+  ],
   "type": "module",
   "main": "./dist/licss.cjs",
   "module": "./dist/licss.js",
+  "types": "./dist/licss.d.cts",
   "exports": {
     ".": {
       "import": "./dist/licss.js",
@@ -28,13 +35,6 @@
     },
     "./package.json": "./package.json"
   },
-  "types": "./dist/licss.d.cts",
-  "files": [
-    "dist",
-    "package.json",
-    "LICENSE",
-    "README.md"
-  ],
   "scripts": {
     "test": "vitest",
     "lint": "oxlint",
@@ -47,20 +47,6 @@
     "dev": "tsdown --watch",
     "build": "tsdown"
   },
-  "devDependencies": {
-    "@types/fancy-log": "^2.0.2",
-    "@types/gulp": "^4.0.18",
-    "@types/node": "^25.5.0",
-    "@types/vinyl": "^2.0.12",
-    "@typescript/native-preview": "7.0.0-dev.20260401.1",
-    "oxfmt": "^0.43.0",
-    "oxlint": "^1.58.0",
-    "source-map": "^0.7.6",
-    "tsdown": "^0.21.7",
-    "typescript": "^6.0.2",
-    "vinyl": "^3.0.1",
-    "vitest": "^4.1.2"
-  },
   "dependencies": {
     "browserslist": "^4.28.2",
     "colors": "^1.4.0",
@@ -68,7 +54,21 @@
     "lightningcss": "^1.32.0",
     "plugin-error": "^2.0.1",
     "purgecss": "^8.0.0",
-    "sass-embedded": "1.78.0",
+    "sass-embedded": "^1.99.0",
     "tinyglobby": "^0.2.15"
+  },
+  "devDependencies": {
+    "@types/fancy-log": "^2.0.2",
+    "@types/gulp": "^4.0.18",
+    "@types/node": "^25.5.2",
+    "@types/vinyl": "^2.0.12",
+    "@typescript/native-preview": "7.0.0-dev.20260404.1",
+    "oxfmt": "^0.43.0",
+    "oxlint": "^1.58.0",
+    "source-map": "^0.7.6",
+    "tsdown": "^0.21.7",
+    "typescript": "^6.0.2",
+    "vinyl": "^3.0.1",
+    "vitest": "^4.1.2"
   }
 }

@@ -157,7 +157,14 @@ async function bundleSASS(file, loadPaths, isSourceMap) {
 			loadPaths,
 			syntax: file.extname === ".sass" ? "indented" : "scss",
 			sourceMap: isSourceMap,
-			sourceMapIncludeSources: true
+			sourceMapIncludeSources: true,
+			silenceDeprecations: [
+				"import",
+				"color-functions",
+				"global-builtin",
+				"legacy-js-api",
+				"if-function"
+			]
 		});
 		file.extname = ".css";
 		file.contents = node_buffer.Buffer.from(result.css);
